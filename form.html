@@ -24,6 +24,37 @@
          }
       </style>
       <title>Apply</title>
+      <script type="text/javascript">
+         $(function(){
+            (function ($) {
+                $.fn.serializeFormJSON = function () {
+
+                    var o = {};
+                    var a = this.serializeArray();
+                    $.each(a, function () {
+                        if (o[this.name]) {
+                            if (!o[this.name].push) {
+                                o[this.name] = [o[this.name]];
+                            }
+                            o[this.name].push(this.value || '');
+                        } else {
+                            o[this.name] = this.value || '';
+                        }
+                    });
+                    return o;
+                };
+            })(jQuery);
+
+            $('form').submit(function (e) {
+               e.preventDefault();
+               var data = $(this).serializeFormJSON();
+               $.post("/", data, function( data ) {
+                  $('form').parent().html(data);
+               });
+               console.log(data);
+            });
+         });
+      </script>
    </head>
    <body style="font-size:13px">
       <div id="headerwrap" class="container-fluid">
@@ -39,14 +70,15 @@
          <h3 ><b>RGUKT Bio-Data Form </b></h3>
       </div>
       <div  class = "container">
-         <form id="studentForm"  name="studentForm" action="javascript:void(0);">
+         <form id="studentForm"  name="studentForm">
+            <input type="datetime" hidden name="started_on" value="{{datetime}}">
             <table>
                <tr>
                   <td></td>
                   <td width="105px"><label for="prog" class="control-label">RGUKT ID Number</label></td>
                   <td>
                      <div class="col-xs-8" >
-                                 <input style="width:220px" type="text" class="input" id="middle_name"  placeholder="Enter your RGUKT ID">
+                                 <input style="width:220px" type="text" class="input" id="rgukt_id" name="rgukt_id"  placeholder="Enter your RGUKT ID">
                      </div>
                   </td>
                </tr>
@@ -58,7 +90,7 @@
                   <td width="105px"><label for="first_name" class="control-label" > First Name </label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="first_name" placeholder="Enter First Name">
+                        <input style="width:220px" type="text" class="input" id="first_name" name="first_name" placeholder="Enter First Name">
                      </div>
                   </td>
                </tr>
@@ -68,7 +100,7 @@
                   <td width="105px"><label for="middle_name" class="control-label">Middle Name</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="middle_name"  placeholder="Optional"
+                        <input style="width:220px" type="text" class="input" id="middle_name" name="middle_name"  placeholder="Optional"
                            >
                      </div>
                   </td>
@@ -79,7 +111,7 @@
                   <td width="105px"><label for="last_name" class="control-label" >Last Name </label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="last_name" placeholder="Enter Last Name">
+                        <input style="width:220px" type="text" class="input" id="last_name" name="last_name" placeholder="Enter Last Name">
                      </div>
                   </td>
                </tr>
@@ -101,7 +133,7 @@
                   <td width="105px"><label for="dob" class="control-label">Date of Birth </label></td>
                   <td>
                      <div class="col-xs-8" style="margin-right:30px">
-                        <select style="height:28px;"  id="month" name="month" >
+                        <select style="height:28px;"  id="month" name="dob_month" >
                            <option selected disabled>Month</option>
                            <option value="01">01</option>
                            <option value="02">02</option>
@@ -116,7 +148,7 @@
                            <option value="11">11</option>
                            <option value="12">12</option>
                         </select>
-                        <select style="height:28px;width:50px"  id="day" name="day">
+                        <select style="height:28px;width:50px"  id="day" name="dob_day">
                            <option selected disabled>Day</option>
                            <option value="01">1</option>
                            <option value="02">2</option>
@@ -150,7 +182,7 @@
                            <option value="30">30</option>
                            <option value="31">31</option>
                         </select>
-                        <select style="height:28px;width:63px"  id="year" name="year">
+                        <select style="height:28px;width:63px"  id="year" name="dob_year">
                            <option selected disabled>Year</option>
                            <option value="2000">2000</option>
                            <option value="1999">1999</option>
@@ -233,7 +265,7 @@
                      <td width="105px"><label for="mob" >Mobile Number</label></td>
                      <td>
                         <div class="col-xs-8">
-                           <input style="width:220px"  type="tell"  id="mob" class="input" placeholder=""
+                           <input style="width:220px"  type="tell"  id="mob" name="mobile" class="input" placeholder=""
                               value="+91" >
                         </div>
                      </td>
@@ -241,10 +273,10 @@
                   <p style="margin-left:220px;color:red;" hidden id="mob_error"> </p>
                   <tr>
                      <td></td>
-                     <td width="105px"><label for="skype" >Email ID</label></td>
+                     <td width="105px"><label for="email" >Email ID</label></td>
                      <td>
                         <div class="col-xs-8">
-                           <input style="width:220px"  type="text" class="input"  id="skype" placeholder="Email ID" >
+                           <input style="width:220px"  type="text" class="input"  id="email" name="email" placeholder="Email ID" >
                         </div>
                      </td>
                   </tr>
@@ -254,7 +286,7 @@
                      <td width="105px"><label for="skype" >Skype ID</label></td>
                      <td>
                         <div class="col-xs-8">
-                           <input style="width:220px"  type="text" class="input"  id="skype" placeholder="Optional" >
+                           <input style="width:220px"  type="text" class="input"  id="skype" name="skype" placeholder="Optional" >
                         </div>
                      </td>
                   </tr>
@@ -266,7 +298,7 @@
                   <td width="105px"><label for="1schl_name" class="control-label">School Name</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="1schl_name" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="1schl_name" name="school_name" placeholder=""
                            >
                      </div>
                   </td>
@@ -278,7 +310,7 @@
                   <td>
                      <div class="col-xs-8" style="margin-right:30px" >
                         
-                        <select style="height:28px;width:63px"  id="1year" name="1year">
+                        <select style="height:28px;width:63px"  id="1year" name="date_of_graduation">
                            <option selected disabled>Year</option>
                            <option value="2015">2017</option>
                            <option value="2014">2016</option>
@@ -361,7 +393,7 @@
                   <td width="105px"><label for="1clsrank" class="control-label">Class Rank</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="1clsrank" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="1clsrank" name="class_rank" placeholder=""
                      </div>
                   </td>
                </tr>
@@ -372,7 +404,7 @@
                   <td width="105px"><label for="1cgpa" class="control-label">Cumulative GPA</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="1cgpa" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="1cgpa" name="cgpa" placeholder=""
                            >
                      </div>
                   </td>
@@ -386,7 +418,7 @@
                   <td width="105px"><label for="t3" class="control-label">Father's Name</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t3" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t3" name="father_name" placeholder=""
                            >
                      </div>
                   </td>
@@ -396,7 +428,7 @@
                   <td width="105px"><label for="t4" class="control-label">Highest Level of Education</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <select style="height:28px;width:63px"  id="1year" name="1year">
+                        <select style="height:28px;width:63px"  id="1year" name="father_highest_education">
                            <option selected disabled>Select</option>
                            <option value="10th">10th</option>
                            <option value="12th">12th</option>
@@ -413,7 +445,7 @@
                   <td width="105px"><label for="t4" class="control-label">Occupation</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="father_occupation" placeholder=""
                            >
                      </div>
                   </td>
@@ -423,7 +455,7 @@
                   <td width="105px"><label for="t4" class="control-label">Annual Income</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="father_annual_income" placeholder=""
                            >
                      </div>
                   </td>
@@ -433,7 +465,7 @@
                   <td width="105px"><label for="t4" class="control-label">Mother's Name</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="mother_name" placeholder=""
                            >
                      </div>
                   </td>
@@ -443,7 +475,7 @@
                   <td width="105px"><label for="t4" class="control-label">Highest Level of Education</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <select style="height:28px;width:63px"  id="1year" name="1year">
+                        <select style="height:28px;width:63px"  id="1year" name="mother_highest_education">
                            <option selected disabled>Select</option>
                            <option value="10th">10th</option>
                            <option value="12th">12th</option>
@@ -460,7 +492,7 @@
                   <td width="105px"><label for="t4" class="control-label">Occupation</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="mother_occupation" placeholder=""
                            >
                      </div>
                   </td>
@@ -470,7 +502,7 @@
                   <td width="105px"><label for="t4" class="control-label">Annual Income</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="mother_annual_income" placeholder=""
                            >
                      </div>
                   </td>
@@ -480,7 +512,7 @@
                   <td width="105px"><label for="t1" class="control-label">Annual Family Income</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t1" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t1" name="annual_family_income" placeholder=""
                            >
                      </div>
                   </td>
@@ -491,7 +523,7 @@
                   <td width="105px"><label for="t2" class="control-label">Caste</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t2" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t2" name="caste" placeholder=""
                            >
                      </div>
                   </td>
@@ -506,7 +538,7 @@
                   <td width="110px"><label for="address1" class="control-label">Address Line 1</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="address1" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="address1" name="address1" placeholder=""
                            >
                      </div>
                   </td>
@@ -517,7 +549,7 @@
                   <td width="110px"><label for="address2" class="control-label">Address Line 2</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="address2" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="address2" name="address2" placeholder=""
                            >
                      </div>
                   </td>
@@ -530,8 +562,8 @@
                   <td width="105px"><label for="country" class="control-label">City</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <select style="width:220px;height:28px" type="text" id="city" class="bfh-countries" data-country="IN"
-                           ></select>
+                        <input style="width:220px;height:28px" type="text" id="city" name="city" class="input" data-country="IN"
+                           ></input>
                      </div>
                   </td>
                </tr>
@@ -541,7 +573,7 @@
                   <td width="105px"><label for="zipcode" class="control-label">Pin Code</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="zipcode" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="zipcode" name="zipcode" placeholder=""
                            >
                      </div>
                   </td>
