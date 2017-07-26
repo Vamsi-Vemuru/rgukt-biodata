@@ -52,8 +52,6 @@ class BioData(ndb.Model):
 	class_rank = ndb.StringProperty()
 	cgpa = ndb.StringProperty()
 	father_name = ndb.StringProperty()
-	occupation = ndb.StringProperty()
-	annual_income = ndb.StringProperty()
 	mother_name = ndb.StringProperty()
 	annual_family_income = ndb.StringProperty()
 	caste = ndb.StringProperty()
@@ -61,12 +59,23 @@ class BioData(ndb.Model):
 	address2 = ndb.StringProperty()
 	zipcode = ndb.StringProperty()
 	started_on = ndb.DateTimeProperty()
+	date_of_graduation = ndb.StringProperty()
+	dob_day = ndb.StringProperty()
+	dob_month = ndb.StringProperty()
+	dob_year = ndb.StringProperty()
+	father_annual_income = ndb.StringProperty()
+	father_highest_education = ndb.StringProperty()
+	father_occupation = ndb.StringProperty()
+	gender = ndb.StringProperty()
+	mother_annual_income = ndb.StringProperty()
+	mother_highest_education = ndb.StringProperty()
+	mother_occupation = ndb.StringProperty()
 	submitted_on = ndb.DateTimeProperty(auto_now=True)
 
 def _convert_string_to_date(str_date):
 	return parser.parse(str_date).replace(tzinfo=None)
 
-class MainHandler(webapp2.RequestHandler):
+class BakMainHandler(webapp2.RequestHandler):
 	def get(self):
 		template = JINJA_ENVIRONMENT.get_template('form.html')
 		logging.info(template)
@@ -84,9 +93,11 @@ class MainHandler(webapp2.RequestHandler):
 		class_rank = self.request.POST["class_rank"]
 		cgpa = self.request.POST["cgpa"]
 		father_name = self.request.POST["father_name"]
-		annual_income = self.request.POST["annual_income"]
+		father_annual_income = self.request.POST["father_annual_income"]
+		mother_annual_income = self.request.POST["mother_annual_income"]
 		mother_name = self.request.POST["mother_name"]
-		occupation = self.request.POST["occupation"]
+		mother_occupation = self.request.POST["mother_occupation"]
+		father_occupation = self.request.POST["father_occupation"]
 		annual_family_income = self.request.POST["annual_family_income"]
 		caste = self.request.POST["caste"]
 		address1 = self.request.POST["address1"]
@@ -122,6 +133,24 @@ class MainHandler(webapp2.RequestHandler):
 		bioData.put()
 		self.response.out.write(["Form submission successfull with these values", bioData])
 
+class MainHandler(webapp2.RequestHandler):
+	def get(self):
+		template = JINJA_ENVIRONMENT.get_template('form.html')
+		logging.info(template)
+		self.response.out.write(template.render({'datetime':datetime.datetime.now()}))
+	def post(self):
+		form_items = self.request.POST.items()
+		started_on = _convert_string_to_date(self.request.POST["started_on"])
+		logging.info(form_items)
+		bioData = BioData()
+		for item in form_items:
+			if item[0] == "started_on":
+				setattr(bioData, item[0], started_on)
+			else:
+				setattr(bioData, item[0], item[1])
+		bioData.put()
+		logging.info(bioData)
+		self.response.out.write(["Form submission successfull with these values", bioData])
 
 class BioDataHandler(webapp2.RequestHandler):
 	def get(self):
@@ -151,10 +180,19 @@ class BioDataHandler(webapp2.RequestHandler):
 				"school_name",
 				"class_rank",
 				"cgpa",
+				"dob_day",
+				"dob_month",
+				"dob_year",
+				"gender",
+				"date_of_graduation",
 				"father_name",
-				"occupation",
-				"annual_income",
+				"father_highest_education",
+				"father_occupation",
+				"father_annual_income",
 				"mother_name",
+				"mother_highest_education",
+				"mother_occupation",
+				"mother_annual_income",
 				"annual_family_income",
 				"caste",
 				"address1",

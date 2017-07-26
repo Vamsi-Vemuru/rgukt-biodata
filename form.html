@@ -49,7 +49,7 @@
                e.preventDefault();
                var data = $(this).serializeFormJSON();
                $.post("/", data, function( data ) {
-                  alert( data );
+                  console.log(data);
                });
                console.log(data);
             });
@@ -428,7 +428,7 @@
                   <td width="105px"><label for="t4" class="control-label">Highest Level of Education</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <select style="height:28px;width:63px"  id="1year" name="highest_education">
+                        <select style="height:28px;width:63px"  id="1year" name="father_highest_education">
                            <option selected disabled>Select</option>
                            <option value="10th">10th</option>
                            <option value="12th">12th</option>
@@ -445,7 +445,7 @@
                   <td width="105px"><label for="t4" class="control-label">Occupation</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" name="occupation" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="father_occupation" placeholder=""
                            >
                      </div>
                   </td>
@@ -455,7 +455,7 @@
                   <td width="105px"><label for="t4" class="control-label">Annual Income</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" name="annual_income" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="father_annual_income" placeholder=""
                            >
                      </div>
                   </td>
@@ -475,7 +475,7 @@
                   <td width="105px"><label for="t4" class="control-label">Highest Level of Education</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <select style="height:28px;width:63px"  id="1year" name="highest_education">
+                        <select style="height:28px;width:63px"  id="1year" name="mother_highest_education">
                            <option selected disabled>Select</option>
                            <option value="10th">10th</option>
                            <option value="12th">12th</option>
@@ -492,7 +492,7 @@
                   <td width="105px"><label for="t4" class="control-label">Occupation</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" name="occupation" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="mother_occupation" placeholder=""
                            >
                      </div>
                   </td>
@@ -502,7 +502,7 @@
                   <td width="105px"><label for="t4" class="control-label">Annual Income</label></td>
                   <td>
                      <div class="col-xs-8">
-                        <input style="width:220px" type="text" class="input" id="t4" name="annual_income" placeholder=""
+                        <input style="width:220px" type="text" class="input" id="t4" name="mother_annual_income" placeholder=""
                            >
                      </div>
                   </td>
