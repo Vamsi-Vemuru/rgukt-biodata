@@ -58,6 +58,7 @@ class BioData(ndb.Model):
 	address1 = ndb.StringProperty()
 	address2 = ndb.StringProperty()
 	zipcode = ndb.StringProperty()
+	city = ndb.StringProperty()
 	started_on = ndb.DateTimeProperty()
 	date_of_graduation = ndb.StringProperty()
 	dob_day = ndb.StringProperty()
@@ -150,7 +151,9 @@ class MainHandler(webapp2.RequestHandler):
 				setattr(bioData, item[0], item[1])
 		bioData.put()
 		logging.info(bioData)
-		self.response.out.write(["Form submission successfull with these values", bioData])
+		# self.response.out.write(["Form submission successfull with these values", bioData])
+		self.response.out.write("<html><body><strong>Your data saved successfully</strong></body></html>")
+
 
 class BioDataHandler(webapp2.RequestHandler):
 	def get(self):
@@ -198,8 +201,10 @@ class BioDataHandler(webapp2.RequestHandler):
 				"address1",
 				"address2",
 				"zipcode",
+				"city",
 				"started_on",
-				"submitted_on"
+				"submitted_on",
+				"response_time"
 			]
 			
 			writer = csv.DictWriter(self.response.out, fieldnames=fieldnames)
@@ -208,6 +213,7 @@ class BioDataHandler(webapp2.RequestHandler):
 			students = BioData.query()
 			for student in students:
 				logging.info(student.to_dict())
+				student.response_time = student.submitted_on - student.started_on
 				writer.writerow(student.to_dict())
 
 app = webapp2.WSGIApplication([
