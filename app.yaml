@@ -9,6 +9,10 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /events\.js
+  static_files: events.js
+  upload: events\.js
+
 - url: .*
   script: main.app
 

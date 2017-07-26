@@ -141,18 +141,23 @@ class MainHandler(webapp2.RequestHandler):
 		self.response.out.write(template.render({'datetime':datetime.datetime.now()}))
 	def post(self):
 		form_items = self.request.POST.items()
-		started_on = _convert_string_to_date(self.request.POST["started_on"])
-		logging.info(form_items)
-		bioData = BioData()
-		for item in form_items:
-			if item[0] == "started_on":
-				setattr(bioData, item[0], started_on)
-			else:
-				setattr(bioData, item[0], item[1])
-		bioData.put()
-		logging.info(bioData)
-		# self.response.out.write(["Form submission successfull with these values", bioData])
-		self.response.out.write("<html><body><strong>Your data saved successfully</strong></body></html>")
+		email = self.request.POST["email"]
+		exist = BioData.query(BioData.email == email).fetch()
+		if not exist:
+			started_on = _convert_string_to_date(self.request.POST["started_on"])
+			logging.info(form_items)
+			bioData = BioData()
+			for item in form_items:
+				if item[0] == "started_on":
+					setattr(bioData, item[0], started_on)
+				else:
+					setattr(bioData, item[0], item[1])
+			bioData.put()
+			logging.info(bioData)
+			# self.response.out.write(["Form submission successfull with these values", bioData])
+			self.response.out.write("<html><body><strong>Your data saved successfully</strong></body></html>")
+		else:
+			self.response.out.write("<html><body><strong>An entry already exist</strong></body></html>")
 
 
 class BioDataHandler(webapp2.RequestHandler):
@@ -202,8 +207,6 @@ class BioDataHandler(webapp2.RequestHandler):
 				"address2",
 				"zipcode",
 				"city",
-				"started_on",
-				"submitted_on",
 				"response_time"
 			]
 			
@@ -212,9 +215,13 @@ class BioDataHandler(webapp2.RequestHandler):
 			writer.writeheader()
 			students = BioData.query()
 			for student in students:
-				logging.info(student.to_dict())
-				student.response_time = student.submitted_on - student.started_on
-				writer.writerow(student.to_dict())
+				student = student.to_dict()
+				timeDiff = student["submitted_on"] - student["started_on"]
+				student["response_time"] = round(timeDiff.total_seconds() / 60)
+				student.pop("started_on", None)
+				student.pop("submitted_on", None)
+				# logging.info(student)
+				writer.writerow(student)
 
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
