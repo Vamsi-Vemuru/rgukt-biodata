@@ -64,11 +64,9 @@ class BioData(ndb.Model):
 	dob_day = ndb.StringProperty()
 	dob_month = ndb.StringProperty()
 	dob_year = ndb.StringProperty()
-	father_annual_income = ndb.StringProperty()
 	father_highest_education = ndb.StringProperty()
 	father_occupation = ndb.StringProperty()
 	gender = ndb.StringProperty()
-	mother_annual_income = ndb.StringProperty()
 	mother_highest_education = ndb.StringProperty()
 	mother_occupation = ndb.StringProperty()
 	submitted_on = ndb.DateTimeProperty(auto_now=True)
@@ -94,8 +92,6 @@ class BakMainHandler(webapp2.RequestHandler):
 		class_rank = self.request.POST["class_rank"]
 		cgpa = self.request.POST["cgpa"]
 		father_name = self.request.POST["father_name"]
-		father_annual_income = self.request.POST["father_annual_income"]
-		mother_annual_income = self.request.POST["mother_annual_income"]
 		mother_name = self.request.POST["mother_name"]
 		mother_occupation = self.request.POST["mother_occupation"]
 		father_occupation = self.request.POST["father_occupation"]
@@ -119,8 +115,7 @@ class BakMainHandler(webapp2.RequestHandler):
 			class_rank = class_rank, 
 			cgpa = cgpa, 
 			father_name = father_name, 
-			occupation = occupation, 
-			annual_income = annual_income, 
+			occupation = occupation,  
 			mother_name = mother_name, 
 			annual_family_income = annual_family_income, 
 			caste = caste, 
@@ -191,11 +186,9 @@ class BioDataHandler(webapp2.RequestHandler):
 				"father_name",
 				"father_highest_education",
 				"father_occupation",
-				"father_annual_income",
 				"mother_name",
 				"mother_highest_education",
 				"mother_occupation",
-				"mother_annual_income",
 				"annual_family_income",
 				"caste",
 				"address1",
