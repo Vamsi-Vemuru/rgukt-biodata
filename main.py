@@ -71,6 +71,36 @@ class BioData(ndb.Model):
 	mother_occupation = ndb.StringProperty()
 	submitted_on = ndb.DateTimeProperty(auto_now=True)
 
+class BioDataTime(ndb.Model):
+	email = ndb.StringProperty()
+	rgukt_id_time = ndb.FloatProperty()
+	first_name_time = ndb.FloatProperty()
+	middle_name_time = ndb.FloatProperty()
+	last_name_time = ndb.FloatProperty()
+	mobile_time = ndb.FloatProperty()
+	email_time = ndb.FloatProperty()
+	skype_time = ndb.FloatProperty()
+	school_name_time = ndb.FloatProperty()
+	class_rank_time = ndb.FloatProperty()
+	cgpa_time = ndb.FloatProperty()
+	father_name_time = ndb.FloatProperty()
+	mother_name_time = ndb.FloatProperty()
+	annual_family_income_time = ndb.FloatProperty()
+	caste_time = ndb.FloatProperty()
+	address1_time = ndb.FloatProperty()
+	address2_time = ndb.FloatProperty()
+	zipcode_time = ndb.FloatProperty()
+	city_time = ndb.FloatProperty()
+	date_of_graduation_time = ndb.FloatProperty()
+	dob_day_time = ndb.FloatProperty()
+	dob_month_time = ndb.FloatProperty()
+	dob_year_time = ndb.FloatProperty()
+	father_highest_education_time = ndb.FloatProperty()
+	father_occupation_time = ndb.FloatProperty()
+	gender_time = ndb.FloatProperty()
+	mother_highest_education_time = ndb.FloatProperty()
+	mother_occupation_time = ndb.FloatProperty()
+
 def _convert_string_to_date(str_date):
 	return parser.parse(str_date).replace(tzinfo=None)
 
@@ -132,6 +162,13 @@ class BakMainHandler(webapp2.RequestHandler):
 		bioData.put()
 		self.response.out.write(["Form submission successfull with these values", bioData])
 
+class Testing(webapp2.RequestHandler):
+	def get(self):
+		bioData = BioData()
+		setattr(bioData, "rgukt_id_time", "12:23")
+		bioData.put()
+		return bioData
+
 class MainHandler(webapp2.RequestHandler):
 	def get(self):
 		template = JINJA_ENVIRONMENT.get_template('form.html')
@@ -145,13 +182,20 @@ class MainHandler(webapp2.RequestHandler):
 			started_on = _convert_string_to_date(self.request.POST["started_on"])
 			logging.info(form_items)
 			bioData = BioData()
+			bioDataTime = BioDataTime()
 			for item in form_items:
 				if item[0] == "started_on":
 					setattr(bioData, item[0], started_on)
 				else:
-					setattr(bioData, item[0], item[1])
+					if item[0].endswith("_time"):
+						setattr(bioDataTime, item[0], float(item[1]))
+					else:
+						setattr(bioData, item[0], item[1])
 			bioData.put()
+			setattr(bioDataTime, "email", email)
+			bioDataTime.put()
 			logging.info(bioData)
+			logging.info(bioDataTime)
 			# self.response.out.write(["Form submission successfull with these values", bioData])
 			self.response.out.write("<html><body><strong>Your data saved successfully</strong></body></html>")
 		else:
@@ -212,13 +256,83 @@ class BioDataHandler(webapp2.RequestHandler):
 			students = BioData.query()
 			for student in students:
 				student = student.to_dict()
-				timeDiff = student["submitted_on"] - student["started_on"]
-				student["response_time"] = round(timeDiff.total_seconds() / 60)
+				if student["started_on"]:
+					timeDiff = student["submitted_on"] - student["started_on"]
+					student["response_time"] = round(timeDiff.total_seconds() / 60)
 				student.pop("started_on", None)
 				student.pop("submitted_on", None)
 				writer.writerow(student)
 
+class BioDataTimeHandler(webapp2.RequestHandler):
+	def get(self):
+		user = users.get_current_user()
+		if not user:
+			self.redirect(users.create_login_url(self.request.uri), permanent=True, abort=True, code=302)
+		if user.email().lower() not in admins:
+			login_url = users.create_logout_url(self.request.uri)
+			greeting = 'You are not authorized. <a href="{}">Sign in</a> with different account'.format(login_url)
+			self.response.write('<html><body>{}</body></html>'.format(greeting))
+		else:
+
+			#to download attendance for each student date as column and penalties as tuple
+			self.response.headers['Content-Disposition'] = 'attachment; filename=bio_data_timestamp_'+str(datetime.datetime.today())+'.csv'
+			
+			self.response.headers['Content-Type'] = 'application/csv'
+			# writer = csv.writer(self.response.out)
+			# writer.writerow(['foo','foo,bar', 'bar'])   
+			fieldnames = [
+				"email",
+				"rgukt_id_time",
+				"first_name_time",
+				"middle_name_time",
+				"last_name_time",
+				"mobile_time",
+				"email_time",
+				"skype_time",
+				"school_name_time",
+				"class_rank_time",
+				"cgpa_time",
+				"dob_day_time",
+				"dob_month_time",
+				"dob_year_time",
+				"gender_time",
+				"date_of_graduation_time",
+				"father_name_time",
+				"father_highest_education_time",
+				"father_occupation_time",
+				"mother_name_time",
+				"mother_highest_education_time",
+				"mother_occupation_time",
+				"annual_family_income_time",
+				"caste_time",
+				"address1_time",
+				"address2_time",
+				"zipcode_time",
+				"city_time",
+				"total_response_time"
+			]
+			
+			writer = csv.DictWriter(self.response.out, fieldnames=fieldnames)
+
+			writer.writeheader()
+			students = BioDataTime.query()
+			for student in students:
+				student = student.to_dict()
+				total = 0
+				for item in student:
+					if item in ["email", "total_response_time"]:
+						continue
+					if student[item]:
+						time = round(student[item] / 1000)
+						student[item] = time
+						total += time
+				student['total_response_time'] = total
+				writer.writerow(student)
+
+
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
-	('/download_biodata', BioDataHandler)
+	('/testing', Testing),
+	('/download_biodata', BioDataHandler),
+	('/download_biodata_timestamp', BioDataTimeHandler)
 ], debug=True)
