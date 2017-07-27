@@ -55,8 +55,11 @@ class BioData(ndb.Model):
 	mother_name = ndb.StringProperty()
 	annual_family_income = ndb.StringProperty()
 	caste = ndb.StringProperty()
+	sub_caste = ndb.StringProperty()
+	houseno = ndb.StringProperty()
+	streetname = ndb.StringProperty()
 	address1 = ndb.StringProperty()
-	address2 = ndb.StringProperty()
+	district = ndb.StringProperty()
 	zipcode = ndb.StringProperty()
 	city = ndb.StringProperty()
 	started_on = ndb.DateTimeProperty()
@@ -70,6 +73,9 @@ class BioData(ndb.Model):
 	mother_highest_education = ndb.StringProperty()
 	mother_occupation = ndb.StringProperty()
 	submitted_on = ndb.DateTimeProperty(auto_now=True)
+	school_town = ndb.StringProperty()
+	school_mandal = ndb.StringProperty()
+	school_district = ndb.StringProperty()
 
 def _convert_string_to_date(str_date):
 	return parser.parse(str_date).replace(tzinfo=None)
@@ -99,12 +105,17 @@ class BakMainHandler(webapp2.RequestHandler):
 		father_occupation = self.request.POST["father_occupation"]
 		annual_family_income = self.request.POST["annual_family_income"]
 		caste = self.request.POST["caste"]
+		sub_caste = self.request.POST["sub_caste"]
+		house_no = self.request.POST["houseno"]
+		street_name = self.request.POST["streetname"]
 		address1 = self.request.POST["address1"]
 		address2 = self.request.POST["address2"]
 		zipcode = self.request.POST["zipcode"]
 		started_on = _convert_string_to_date(self.request.POST["started_on"])
 		# logging.info(form_items)
-
+		logging.info("there")
+		logging.info(house_no)
+		logging.info(street_name)
 		bioData = BioData(
 			rgukt_id = rgukt_id, 
 			first_name = first_name, 
@@ -122,14 +133,19 @@ class BakMainHandler(webapp2.RequestHandler):
 			mother_name = mother_name, 
 			annual_family_income = annual_family_income, 
 			caste = caste, 
+			house_no = house_no,
+			street_name = street_name,
 			address1 = address1, 
-			address2 = address2, 
 			zipcode = zipcode, 
-			started_on = started_on 
+			started_on = started_on,
+			sub_caste = sub_caste			
 		)
+		logging.info("here")
+		logging.info(bioData)
 		# for item in form_items:
 		# 	setattr(bioData, item[0], item[1])
 		bioData.put()
+
 		self.response.out.write(["Form submission successfull with these values", bioData])
 
 class MainHandler(webapp2.RequestHandler):
@@ -140,7 +156,8 @@ class MainHandler(webapp2.RequestHandler):
 	def post(self):
 		form_items = self.request.POST.items()
 		email = self.request.POST["email"]
-		exist = BioData.query(BioData.email == email).fetch()
+		# exist = BioData.query(BioData.email == email).fetch()
+		exist = False
 		if not exist:
 			started_on = _convert_string_to_date(self.request.POST["started_on"])
 			logging.info(form_items)
@@ -184,7 +201,6 @@ class BioDataHandler(webapp2.RequestHandler):
 				"email",
 				"skype",
 				"school_name",
-				"class_rank",
 				"cgpa",
 				"dob_day",
 				"dob_month",
@@ -199,11 +215,19 @@ class BioDataHandler(webapp2.RequestHandler):
 				"mother_occupation",
 				"annual_family_income",
 				"caste",
+				"sub_caste",
+				"houseno",
+				"streetname",
 				"address1",
-				"address2",
+				"district",
 				"zipcode",
 				"city",
-				"response_time"
+				"response_time",
+				"school_district",
+				'school_mandal', 
+				'school_town',
+				'address2',
+				'class_rank'
 			]
 			
 			writer = csv.DictWriter(self.response.out, fieldnames=fieldnames)
